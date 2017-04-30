@@ -15,11 +15,14 @@ using System.Text;
 
 namespace DotNetCoreToolKit.Library.Implementations.Repositories
 {
-    public class EfDataRepository<T, TContext> : IDataRepository<T>
+    public abstract class EfDataRepository<T, TContext> : IDataRepository<T>
         where T : BaseObjectWithState, IObjectWithState, new()
         where TContext : DbContext, new()
     {
 
+        /// <summary>
+        /// DbContext must be passed in by the extending class.
+        /// </summary>
         protected TContext context;
 
         public EfDataRepository()
@@ -27,25 +30,25 @@ namespace DotNetCoreToolKit.Library.Implementations.Repositories
 
         }
 
-        public EfDataRepository(TContext context)
+        protected EfDataRepository(TContext context)
         {
             this.context = context;
         }
 
 
-        public async Task<bool> EntityExistsByGuid(Guid entityGuid)
+        public virtual async Task<bool> EntityExistsByGuid(Guid entityGuid)
         {
             bool exists = await context.Set<T>().AnyAsync(e => e.Guid == entityGuid);
             return exists;
         }
 
-        public async Task<bool> EntityExistsById(int entityId)
+        public virtual async Task<bool> EntityExistsById(int entityId)
         {
             bool exists = await context.Set<T>().AnyAsync(e => e.Id == entityId);
             return exists;
         }
 
-        public async Task<(IEnumerable<T> records, long totalNumberOfRecords)> FindAllEntitiesByCriteria(
+        public virtual async Task<(IEnumerable<T> records, long totalNumberOfRecords)> FindAllEntitiesByCriteria(
             int? pageNumber, int? pageSize, string[] sortColumns, string[] sortDirections, ExpressionStarter<T> searchFilter)
         {
             return await FindAllByCriteria(
@@ -54,7 +57,7 @@ namespace DotNetCoreToolKit.Library.Implementations.Repositories
         }
 
 
-        protected async Task<(IEnumerable<T> records, long totalNumberOfRecords)> FindAllByCriteria(
+        private async Task<(IEnumerable<T> records, long totalNumberOfRecords)> FindAllByCriteria(
             int? pageNumber,
             int? pageSize,
             string[] sortColumns,
@@ -105,25 +108,25 @@ namespace DotNetCoreToolKit.Library.Implementations.Repositories
             return predicate;
         }
 
-        public async Task<IEnumerable<T>> FindAllEntitiesByPredicate(Expression<Func<T, bool>> predicate)
+        public virtual async Task<IEnumerable<T>> FindAllEntitiesByPredicate(Expression<Func<T, bool>> predicate)
         {
             var items = await context.Set<T>().Where(predicate).ToListAsync();
             return items;
         }
 
-        public async Task<T> FindEntityByGuid(Guid guid)
+        public virtual async Task<T> FindEntityByGuid(Guid guid)
         {
             var entity = await context.Set<T>().FirstOrDefaultAsync(e => e.Guid == guid);
             return entity;
         }
 
-        public async Task<T> FindEntityById(long id)
+        public virtual async Task<T> FindEntityById(long id)
         {
             var entity = await context.Set<T>().FirstOrDefaultAsync(e => e.Id == id);
             return entity;
         }
 
-        public async Task<int> SaveChanges()
+        public virtual async Task<int> SaveChanges()
         {
             context.ApplyStateChanges();
             AuditEntities();
