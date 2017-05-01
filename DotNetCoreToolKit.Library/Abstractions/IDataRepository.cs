@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using DotNetCoreToolKit.Library.Models.Persistence;
 using LinqKit;
+using static DotNetCoreToolKit.Library.Models.Persistence.Enums;
 
 namespace DotNetCoreToolKit.Library.Abstractions
 {
@@ -62,5 +63,7 @@ namespace DotNetCoreToolKit.Library.Abstractions
             string[] sortColumns,
             string[] sortDirections,
             ExpressionStarter<T> searchFilter);
+
+        void AddOrUpdateEntity(T entity);
     }
 }

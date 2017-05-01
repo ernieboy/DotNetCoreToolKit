@@ -1,11 +1,12 @@
 ﻿using System;
+using DotNetCoreToolKit.Library.Abstractions;
 using static DotNetCoreToolKit.Library.Models.Persistence.Enums;
 
 namespace DotNetCoreToolKit.Library.Models.Persistence
 {
-    public abstract class BaseObjectWithState
+    public abstract class BaseObjectWithState: IObjectWithState
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         public Guid Guid { get; set; }
 

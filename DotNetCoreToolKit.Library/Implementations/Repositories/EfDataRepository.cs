@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Linq;
 using System.Text;
+using static DotNetCoreToolKit.Library.Models.Persistence.Enums;
 
 namespace DotNetCoreToolKit.Library.Implementations.Repositories
 {
@@ -70,6 +71,8 @@ namespace DotNetCoreToolKit.Library.Implementations.Repositories
             if (sizeOfPage < 1) sizeOfPage = 5;
             int skipValue = (sizeOfPage * (pageIndex - 1));
             var searchFilter = searchPredicate ?? BuildDefaultSearchFilterPredicate();
+
+            context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
             long totalRecords = context.Set<T>().AsExpandable().Where(searchFilter).Count();
 
@@ -169,5 +172,14 @@ namespace DotNetCoreToolKit.Library.Implementations.Repositories
             }
         }
 
+        public void AddOrUpdateEntity(T entity)
+        {
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
+            if (entity.Guid == null || entity.Guid == Guid.Empty) entity.Guid = Guid.NewGuid();
+
+            //We simply attach the entity to the context here but during SaveChanges we shall call the ApplyStateChanges extension method
+            // in the EfExtensions class to set all entities to the correct state.
+            context.Set<T>().Attach(entity); 
+        }
     }
 }
