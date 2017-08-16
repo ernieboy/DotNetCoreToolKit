@@ -5,7 +5,7 @@ using static DotNetCoreToolKit.Library.Models.Persistence.Enums;
 
 namespace DotNetCoreToolKit.Library.Models.Persistence
 {
-	public abstract class Entity
+    public abstract class Entity: IAggregateRoot
 	{
 
 		int? _requestedHashCode;
