@@ -16,7 +16,7 @@ using System.Text;
 namespace DotNetCoreToolKit.Library.Implementations.Repositories
 {
     public abstract class EfDataRepository<T, TContext> : IDataRepository<T>
-        where T : BaseObjectWithState, IObjectWithState, new()
+        where T : Entity, IObjectWithState, IAggregateRoot, new()
         where TContext : DbContext, new()
     {
 

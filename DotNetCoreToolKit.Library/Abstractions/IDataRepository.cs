@@ -8,7 +8,7 @@ using LinqKit;
 namespace DotNetCoreToolKit.Library.Abstractions
 {
     public interface IDataRepository<T>
-        where T : BaseObjectWithState, IObjectWithState, new()
+        where T : Entity, IObjectWithState, IAggregateRoot, new()
     {
 
         Task<int> SaveChanges();
