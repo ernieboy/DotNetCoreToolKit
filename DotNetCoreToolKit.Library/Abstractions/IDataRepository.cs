@@ -9,7 +9,7 @@ using static DotNetCoreToolKit.Library.Models.Persistence.Enums;
 namespace DotNetCoreToolKit.Library.Abstractions
 {
     public interface IDataRepository<T>
-        where T : BaseObjectWithState, IObjectWithState, new()
+        where T : Entity, IObjectWithState, new()
     {
 
         Task<int> SaveChanges();

@@ -17,7 +17,7 @@ using static DotNetCoreToolKit.Library.Models.Persistence.Enums;
 namespace DotNetCoreToolKit.Library.Implementations.Repositories
 {
     public abstract class EfDataRepository<T, TContext> : IDataRepository<T>
-        where T : BaseObjectWithState, IObjectWithState, new()
+        where T : Entity, IObjectWithState, new()
         where TContext : DbContext, new()
     {
 
