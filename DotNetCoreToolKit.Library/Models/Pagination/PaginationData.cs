@@ -18,6 +18,10 @@
 
         public string[] SortColumns { get; set; }   
 
-        public string[] SortDirections { get; set; }  
+        public string[] SortDirections { get; set; }
+
+        public string ControllerName { get; set; }
+
+        public string ControllerAction { get; set; }
     }
 }
