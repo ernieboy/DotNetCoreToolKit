@@ -1,47 +1,26 @@
-﻿using System;
+﻿using DotNetCoreToolKit.Library.Models.Persistence;
+using LinqKit;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using DotNetCoreToolKit.Library.Models.Persistence;
-using LinqKit;
-using static DotNetCoreToolKit.Library.Models.Persistence.Enums;
 
 namespace DotNetCoreToolKit.Library.Abstractions
 {
     public interface IDataRepository<T>
-        where T : Entity, IObjectWithState, new()
+        where T : AggregateRoot, IAuditable, IObjectWithState, new()
     {
 
-        Task<int> SaveChanges();
+        Task SaveEntity(T entity);
 
         /// <summary>
         /// Finds an entity by its id.
         /// </summary>
         /// <param name="id">The ID of the entity to search for.</param>
-        /// <returns>The entity if found, it's up to the implementer what to return if the entity was not found. They can throw a NotFoundException if needed.</returns>
-        Task<T> FindEntityById(long id);
+        /// <returns>The entity if found, it's up to the implementer what to do if the entity was not found.</returns>
+        Task<T> FindById(Guid id);
 
-        /// <summary>
-        /// Finds an entity by its GUID.
-        /// </summary>
-        /// <param name="guid">The GUID of the entity to search for.</param>
-        /// <returns>The entity if found, it's up to the implementer what to return if the entity was not found. They can throw a NotFoundException if needed.</returns>
-        Task<T> FindEntityByGuid(Guid guid);
-
-        /// <summary>
-        /// Checks if an entity exists in the repository by its ID.
-        /// </summary>
-        /// <param name="entityId">The ID of the entity to search for.</param>
-        /// <returns>True if the entity was found, false otherwise.</returns>
-        Task<bool> EntityExistsById(int entityId);
-
-        /// <summary>
-        /// Checks if an entity exists in the repository by its GUID.
-        /// </summary>
-        /// <param name="entityGuid">The GUID of the entity to search for.</param>
-        /// <returns>True if the entity was found, false otherwise.</returns>
-        Task<bool> EntityExistsByGuid(Guid entityGuid); 
-
+       
         /// <summary>
         /// Returns all entities of type T from the repository based on predicate. 
         /// </summary>
@@ -63,7 +42,5 @@ namespace DotNetCoreToolKit.Library.Abstractions
             string[] sortColumns,
             string[] sortDirections,
             ExpressionStarter<T> searchFilter);
-
-        void AddOrUpdateEntity(T entity);
     }
 }

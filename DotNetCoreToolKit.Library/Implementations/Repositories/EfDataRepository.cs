@@ -1,23 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using DotNetCoreToolKit.Library.Abstractions;
+﻿using DotNetCoreToolKit.Library.Abstractions;
 using DotNetCoreToolKit.Library.Extensions;
 using DotNetCoreToolKit.Library.Models.Persistence;
 using LinqKit;
-using System.Linq.Dynamic.Core;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
+using System.Linq.Expressions;
+using System.Security.Claims;
 using System.Text;
-using static DotNetCoreToolKit.Library.Models.Persistence.Enums;
+using System.Threading.Tasks;
+using DotNetCoreToolKit.Library.Extensions;
 
 namespace DotNetCoreToolKit.Library.Implementations.Repositories
 {
     public abstract class EfDataRepository<T, TContext> : IDataRepository<T>
-        where T : Entity, IObjectWithState, new()
+        where T : AggregateRoot, new()
         where TContext : DbContext, new()
     {
 
@@ -25,28 +26,16 @@ namespace DotNetCoreToolKit.Library.Implementations.Repositories
         /// DbContext must be passed in by the extending class.
         /// </summary>
         protected TContext context;
+        private readonly IMediator _mediatr;
 
         public EfDataRepository()
         {
-
         }
 
-        protected EfDataRepository(TContext context)
+        protected EfDataRepository(TContext context, IMediator mediatr)
         {
             this.context = context;
-        }
-
-
-        public virtual async Task<bool> EntityExistsByGuid(Guid entityGuid)
-        {
-            bool exists = await context.Set<T>().AnyAsync(e => e.Guid == entityGuid);
-            return exists;
-        }
-
-        public virtual async Task<bool> EntityExistsById(int entityId)
-        {
-            bool exists = await context.Set<T>().AnyAsync(e => e.Id == entityId);
-            return exists;
+            _mediatr = mediatr;
         }
 
         public virtual async Task<(IEnumerable<T> records, long totalNumberOfRecords)> FindAllEntitiesByCriteria(
@@ -117,24 +106,18 @@ namespace DotNetCoreToolKit.Library.Implementations.Repositories
             return items;
         }
 
-        public virtual async Task<T> FindEntityByGuid(Guid guid)
+        public async Task<T> FindById(Guid guid)    
         {
-            var entity = await context.Set<T>().FirstOrDefaultAsync(e => e.Guid == guid);
+            var entity = await context.Set<T>().FirstOrDefaultAsync(e => e.Id == guid);
             return entity;
         }
 
-        public virtual async Task<T> FindEntityById(long id)
-        {
-            var entity = await context.Set<T>().FirstOrDefaultAsync(e => e.Id == id);
-            return entity;
-        }
-
-        public virtual async Task<int> SaveChanges()
+        public virtual async Task SaveEntity(T entity)
         {
             context.ApplyStateChanges();
             AuditEntities();
+            await _mediatr.DispatchDomainEventsAsync<TContext,T>(context);
             int affected = await context.SaveChangesAsync();
-            return affected;
         }
 
         private void AuditEntities()
@@ -170,16 +153,6 @@ namespace DotNetCoreToolKit.Library.Implementations.Repositories
                     entry.Property("UpdatedAt").CurrentValue = now;
                 }
             }
-        }
-
-        public void AddOrUpdateEntity(T entity)
-        {
-            if (entity == null) throw new ArgumentNullException(nameof(entity));
-            if (entity.Guid == null || entity.Guid == Guid.Empty) entity.Guid = Guid.NewGuid();
-
-            //We simply attach the entity to the context here but during SaveChanges we shall call the ApplyStateChanges extension method
-            // in the EfExtensions class to set all entities to the correct state.
-            context.Set<T>().Attach(entity); 
         }
     }
 }
