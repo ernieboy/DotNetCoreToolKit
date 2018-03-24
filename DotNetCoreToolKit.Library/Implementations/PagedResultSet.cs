@@ -20,7 +20,7 @@ namespace DotNetCoreToolKit.Library.Implementations
         }
 
         public async Task<(IEnumerable<T> items, PaginationData paginationData)> GetPagedList<T>(
-            string initialSearchQuery, int? pageNumber, int? pageSize, string searchTermsCommaSeparated, string sortColumn = "newId()", string sortDirection = "ASC") where T : class
+            string initialSearchQuery, int? pageNumber, int? pageSize, string searchTermsCommaSeparated , string sortColumn = "newId()", string sortDirection = "ASC") where T : class
         {
             var query = initialSearchQuery;
          
@@ -28,17 +28,19 @@ namespace DotNetCoreToolKit.Library.Implementations
             int sizeOfPage = pageSize ?? 10;
             if (pageIndex < 1) pageIndex = 1;
             if (sizeOfPage < 1) sizeOfPage = 5;
+            if (searchTermsCommaSeparated == null) searchTermsCommaSeparated = string.Empty;
+
 
             query += $" ORDER BY {sortColumn} {sortDirection} ";
             var pagingPart = $" OFFSET {sizeOfPage} * ({pageIndex} - 1) ROWS FETCH NEXT {sizeOfPage} ROWS ONLY OPTION (RECOMPILE);";
             query += pagingPart;
 
-            var countQuery = BuildCountQueryFromInitialQuery(initialSearchQuery, searchTermsCommaSeparated);
+            var countQuery = BuildCountQueryFromInitialQuery(query, searchTermsCommaSeparated);
             int totalRecords = 0;
 
             int offsetFromStart = (pageIndex - 1) * sizeOfPage + 1;
             int offsetUpperBound = offsetFromStart + (sizeOfPage - 1);
-            if (offsetUpperBound > totalRecords) offsetUpperBound = totalRecords;
+          
 
             IEnumerable <T> list = null;
             using (var dbCon = new SqlConnection(_connectionString))
@@ -46,6 +48,7 @@ namespace DotNetCoreToolKit.Library.Implementations
                 totalRecords = await dbCon.ExecuteScalarAsync<int>(countQuery);
                 list = await dbCon.QueryAsync<T>(query);
             }
+            if (offsetUpperBound > totalRecords) offsetUpperBound = totalRecords;
             var paginationData = new PaginationData
             {
                 SortColumn = sortColumn,

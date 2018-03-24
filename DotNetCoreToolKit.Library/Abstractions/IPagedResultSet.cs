@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace DotNetCoreToolKit.Library.Abstractions
 {
-    interface IPagedResultSet
+    public interface IPagedResultSet
     {
         Task<(IEnumerable<T> items, PaginationData paginationData)> GetPagedList<T>(
             string initialSearchQuery, int? pageNumber, int? pageSize, string searchTermsCommaSeparated, string sortColumn, string sortDirection)

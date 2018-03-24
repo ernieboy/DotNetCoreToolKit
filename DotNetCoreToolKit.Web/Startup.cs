@@ -11,6 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 using DotNetCoreToolKit.Web.Data;
 using DotNetCoreToolKit.Web.Models;
 using DotNetCoreToolKit.Web.Services;
+using DotNetCoreToolKit.Library.Abstractions;
+using DotNetCoreToolKit.Library.Implementations;
 
 namespace DotNetCoreToolKit.Web
 {
@@ -35,6 +37,8 @@ namespace DotNetCoreToolKit.Web
 
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
+            services.AddScoped<IPagedResultSet>( i => new PagedResultSet(Configuration.GetConnectionString("WideWorldImportersDWConnection")));
+
 
             services.AddMvc();
         }

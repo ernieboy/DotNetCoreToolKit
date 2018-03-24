@@ -1,0 +1,56 @@
+﻿@model SuplliersListingPageViewModel
+
+
+
+<h3>Suppliers</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Supplier Key
+            </th>
+            <th>
+                Name
+            </th>
+            <th>
+                Category
+            </th>
+           
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <td>
+                    @item.SupplierKey
+                </td>
+                <td>
+                    @item.Name
+                </td>
+                <td>
+                    @item.Category
+                </td>
+               
+            </tr>
+        }
+    </tbody>
+</table>
+
+@await Component.InvokeAsync("ListPager",
+new
+{
+    controllerName = Model.PaginationData.ControllerName,
+    controllerAction = Model.PaginationData.ControllerAction,
+    totalNumberOfItems = Model.PaginationData.TotalNumberOfRecords,
+    pageNumber = Model.PaginationData.PageNumber,
+    pageSize = Model.PaginationData.PageSize,
+    totalNumberOfPages = Model.PaginationData.TotalNumberOfPages,
+    offset = Model.PaginationData.OffsetFromZero,
+    offsetUpperBound = Model.PaginationData.OffsetUpperBound,
+    searchTerms = Model.PaginationData.SearchTermsCommaSeparated,
+    sortCol = Model.PaginationData.SortColumn,
+    sortDir = Model.PaginationData.SortDirection
+})
+

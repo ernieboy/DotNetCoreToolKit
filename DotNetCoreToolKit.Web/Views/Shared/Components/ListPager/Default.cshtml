@@ -1,0 +1,110 @@
+﻿@{
+    //We always want to show 8 pages max for navigation if we have more than 8 pages so that we don't clutter the screen with lots of pages.
+    int maxNavigationPagesToDisplay = 8;
+    int pageNumber = (int)Model.PaginationData.PageNumber;
+    int lastPage = (int)Model.PaginationData.TotalNumberOfPages;
+    int countInitialValue = 0;
+    int rightPageCount = 0;
+    int pagesToAdd = 0;
+    int previousPage = (pageNumber - 1);
+    string searchTerms = Model.PaginationData.SearchTermsCommaSeparated;
+    string sortCol = Model.PaginationData.SortColumn;
+    string sortDir = Model.PaginationData.SortDirection;
+}
+@if (Model.PaginationData.TotalNumberOfRecords > 0)
+{
+    <div>Showing @Model.PaginationData.OffsetFromZero to @Model.PaginationData.OffsetUpperBound records of @Model.PaginationData.TotalNumberOfRecords. This is page @Model.PaginationData.PageNumber of @Model.PaginationData.TotalNumberOfPages.</div>
+}
+<ul class="pagination pagination-sm">
+    @if (Model.PaginationData.TotalNumberOfRecords > Model.PaginationData.PageSize)
+    {
+        if (pageNumber == 1)
+        {
+            <li><a href="#">&lt;&lt; First  &lt; Prev&nbsp; </a></li>
+        }
+        else
+        {
+            <li><a href="@ViewBag.url?pageNumber=1&pageSize=@Model.PaginationData.PageSize&searchTerms=@searchTerms&sortCol=@sortCol&sortDir=@sortDir">&lt;&lt; First</a></li>
+            <li><a href="@ViewBag.url?pageNumber=@previousPage&pageSize=@Model.PaginationData.PageSize&searchTerms=@searchTerms&sortCol=@sortCol&sortDir=@sortDir">&lt;&lt; Prev</a></li>
+        }
+    }
+    @if (Model.PaginationData.TotalNumberOfRecords > Model.PaginationData.PageSize)
+    {
+        //Display the pages on the left of the page that is currently being displayed : START
+        @if ((pageNumber - 4) > 0)
+        {
+            countInitialValue = (pageNumber - 4);
+            if ((lastPage - pageNumber) < 3)
+            {
+                rightPageCount = (lastPage - pageNumber);
+                pagesToAdd = (maxNavigationPagesToDisplay - rightPageCount);
+                countInitialValue = (lastPage - pagesToAdd);
+                if ((lastPage == pageNumber) || (rightPageCount == 2))
+                {
+                    countInitialValue = (lastPage - (maxNavigationPagesToDisplay - 1));
+                }
+            }
+
+            @for (int i = countInitialValue; i <= pageNumber; i++)
+            {
+                string currentPageClass1 = ((int)Model.PaginationData.PageNumber == i) ? "active" : "inactive";
+                <li class="@currentPageClass1"><a href="@ViewBag.url?pageNumber=@i&pageSize=@Model.PaginationData.SizeOfPage&searchTerms=@searchTerms&sortCol=@sortCol&sortDir=@sortDir">@i</a></li>
+            }
+
+        }
+        else if ((pageNumber - 4) < 2)
+        {
+            @for (int i = 1; i <= pageNumber; i++)
+            {
+                string currentPageClass = ((int)Model.PaginationData.PageNumber == i) ? "active" : "inactive";
+                <li class="@currentPageClass"><a href="@ViewBag.url?pageNumber=@i&pageSize=@Model.PaginationData.PageSize&searchTerms=@searchTerms&sortCol=@sortCol&sortDir=@sortDir">@i</a></li>
+            }
+        }
+        //Display the pages on the left of the page that is currently being displayed : END
+
+
+
+        //Display the pages on the right of the page that is currently being displayed : START
+        @if ((lastPage - pageNumber) <= 4)
+        {
+            @for (int i = pageNumber + 1; i <= lastPage; i++)
+            {
+                string currentPageClass = ((int)Model.PaginationData.PageNumber == i) ? "active" : "inactive";
+                <li class="@currentPageClass"><a href="@ViewBag.url?pageNumber=@i&pageSize=@Model.PaginationData.PageSize&searchTerms=@searchTerms&sortCol=@sortCol&sortDir=@sortDir">@i</a></li>
+            }
+        }
+        else if (((lastPage - pageNumber) > 4) && (pageNumber > 5))
+        {
+            @for (int i = pageNumber + 1; i <= (pageNumber + 3); i++)
+            {
+                string currentPageClass = ((int)Model.PaginationData.PageNumber == i) ? "active" : "inactive";
+                <li class="@currentPageClass"><a href="@ViewBag.url?pageNumber=@i&pageSize=@Model.PaginationData.PageSize&searchTerms=@searchTerms&sortCol=@sortCol&sortDir=@sortDir">@i</a></li>
+            }
+        }
+        else if (pageNumber < 6)
+        {
+            @for (int i = pageNumber + 1; i < (maxNavigationPagesToDisplay + 1); i++)
+            {
+                string currentPageClass = ((int)Model.PaginationData.PageNumber == i) ? "active" : "inactive";
+                <li class="@currentPageClass"><a href="@ViewBag.url?pageNumber=@i&pageSize=@Model.PaginationData.PageSize&searchTerms=@searchTerms&sortCol=@sortCol&sortDir=@sortDir">@i</a></li>
+            }
+        }
+
+        //Display the pages on the right of the page that is currently being displayed : END
+
+        if (Model.PaginationData.TotalNumberOfRecords > Model.PaginationData.PageSize)
+        {
+            if (pageNumber == lastPage)
+            {
+                <li><a href="@ViewBag.url#"> &nbsp;Next > &nbsp; Last</a></li>
+            }
+            else
+            {
+                int nextPage = pageNumber + 1;
+                <li><a href="@ViewBag.url?pageNumber=@nextPage&pageSize=@Model.PaginationData.PageSize&searchTerms=@searchTerms&sortCol=@sortCol&sortDir=@sortDir">&nbsp;Next &gt;</a></li>
+                <li><a href="@ViewBag.url?pageNumber=@lastPage&pageSize=@Model.PaginationData.PageSize&searchTerms=@searchTerms&sortCol=@sortCol&sortDir=@sortDir">&nbsp;Last &gt;</a></li>
+            }
+        }
+
+    }
+</ul>
