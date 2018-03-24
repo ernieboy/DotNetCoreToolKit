@@ -20,7 +20,7 @@ namespace DotNetCoreToolKit.Library.Implementations
         }
 
         public async Task<(IEnumerable<T> items, PaginationData paginationData)> GetPagedList<T>(
-            string initialSearchQuery, int? pageNumber, int? pageSize, string sortColumn, string sortDirection, string searchTermsCommaSeparated) where T : class
+            string initialSearchQuery, int? pageNumber, int? pageSize, string searchTermsCommaSeparated, string sortColumn = "newId()", string sortDirection = "ASC") where T : class
         {
             var query = initialSearchQuery;
          
@@ -29,6 +29,7 @@ namespace DotNetCoreToolKit.Library.Implementations
             if (pageIndex < 1) pageIndex = 1;
             if (sizeOfPage < 1) sizeOfPage = 5;
 
+            query += $" ORDER BY {sortColumn} {sortDirection} ";
             var pagingPart = $" OFFSET {sizeOfPage} * ({pageIndex} - 1) ROWS FETCH NEXT {sizeOfPage} ROWS ONLY OPTION (RECOMPILE);";
             query += pagingPart;
 
@@ -61,10 +62,8 @@ namespace DotNetCoreToolKit.Library.Implementations
         }
 
         private string BuildCountQueryFromInitialQuery(string initialSearchQuery, string searchTermsCommaSeparated)
-        {
-
-
-            var match = Regex.Match(initialSearchQuery, @"(?<=from\s)(.*)(?=\sorder\sby)", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.CultureInvariant);
+        {            
+            var match = Regex.Match(initialSearchQuery, @"(?<=from\s)(.*)(?=\sorder\sby)", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline);
             if (match.Success)
             {
                 var countQuery   = $"SELECT COUNT(*) FROM {match.Captures[0].ToString().Trim()} " ;

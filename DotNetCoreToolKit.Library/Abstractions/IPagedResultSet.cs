@@ -7,7 +7,7 @@ namespace DotNetCoreToolKit.Library.Abstractions
     interface IPagedResultSet
     {
         Task<(IEnumerable<T> items, PaginationData paginationData)> GetPagedList<T>(
-            string initialSearchQuery, int? pageNumber, int? pageSize, string sortColumn, string sortDirection, string searchTermsCommaSeparated)       
+            string initialSearchQuery, int? pageNumber, int? pageSize, string searchTermsCommaSeparated, string sortColumn, string sortDirection)
            where T : class;
     }
 }
