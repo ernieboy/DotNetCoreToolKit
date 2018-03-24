@@ -18,21 +18,20 @@ namespace DotNetCoreToolKit.Library.Tests.DatabaseAccess.EntityFramework
                 .UseInMemoryDatabase(databaseName: "MyInMemoryDatabase")
                 .Options;
             var inMemoryDbContext = new InMemoryDbContext(options);
-            var customerRepo = new CustomerRepository(inMemoryDbContext);
+            var customerRepo = new CustomerRepository(inMemoryDbContext, null);
 
             var customer = new Customer("Ernest", "Fakudze", Guid.NewGuid());
-            customer.Id = 1;
+
             customer.ObjectState = ObjectState.Added;
-            Guid custGuid = customer.Guid;
+            Guid custGuid = customer.Id;
 
             //Act
-            customerRepo.AddOrUpdateEntity(customer);
-            await customerRepo.SaveChanges();
-            var custInDb = await customerRepo.FindEntityByGuid(custGuid);
+            await customerRepo.SaveEntity(customer);
+            var custInDb = await customerRepo.FindById(custGuid);
 
             //Assert
             Assert.IsNotNull(custInDb);
-            Assert.AreEqual(custGuid, custInDb.Guid);
+            Assert.AreEqual(custGuid, custInDb.Id);
         }
     }
 }

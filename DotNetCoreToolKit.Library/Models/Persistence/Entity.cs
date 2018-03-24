@@ -6,7 +6,7 @@ namespace DotNetCoreToolKit.Library.Models.Persistence
 {
     public abstract class Entity: IAuditable, IObjectWithState
     {
-		public Guid Id { get; private set; }
+		public Guid Id { get; protected set; }
 
 		public ObjectState ObjectState { get; set; }
 

@@ -3,18 +3,18 @@ using DotNetCoreToolKit.Library.Models.Persistence;
 
 namespace DotNetCoreToolKit.Library.Tests.Models
 {
-    public class Customer : BaseObjectWithState
+    public class Customer : AggregateRoot
     {
 
         public Customer()
         {
 
         }
-        public Customer(string firstName, string lastName, Guid guid)
+        public Customer(string firstName, string lastName, Guid id)
         {
             Firstname = firstName;
             Lastname = lastName;
-            Guid = guid;
+            Id = id;
         }
 
         public string Firstname { get; set; }

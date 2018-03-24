@@ -13,7 +13,6 @@ using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using DotNetCoreToolKit.Library.Extensions;
 
 namespace DotNetCoreToolKit.Library.Implementations.Repositories
 {
